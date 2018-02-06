@@ -1,0 +1,9 @@
+package: go-rabbit
+import:
+- package: github.com/streadway/amqp
+- package: github.com/sirupsen/logrus
+  version: v1.0.3
+- package: github.com/urfave/cli
+  version: ^1.18.1
+- package: github.com/satori/go.uuid
+  version: v1.1.0
