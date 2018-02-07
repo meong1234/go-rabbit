@@ -47,8 +47,8 @@ func (d *publisher) runLoop(publisher messaging.Publisher) {
 		select {
 		default:
 			logger.Debug("publishing started")
-			publisher.Publish("hello", uuid.NewV1().String())
-			time.Sleep(time.Second * 2)
+			publisher.Publish("hello "+uuid.NewV1().String(), uuid.NewV1().String())
+			time.Sleep(time.Second * 1)
 		case stop := <-d.stopChan:
 			if stop {
 				return

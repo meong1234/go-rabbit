@@ -112,7 +112,7 @@ func (c *amqpSubscriber) init(connection *amqp.Connection) error {
 		}
 	}()
 
-	if err := channel.Qos(c.workerCount, 0, false); err != nil {
+	if err := channel.Qos(c.workerCount * 2, 0, false); err != nil {
 		return err
 	}
 
@@ -148,14 +148,7 @@ func (c *amqpSubscriber) init(connection *amqp.Connection) error {
 }
 
 func (c *amqpSubscriber) runEventProcessor(deliveryChan <-chan amqp.Delivery) {
-	pool := make(chan int, c.workerCount)
-	defer close(pool)
-
-	go func() {
-		for i := 0; i < c.workerCount; i++ {
-			pool <- i
-		}
-	}()
+	pool := util.NewIntPool(c.workerCount)
 
 	for {
 		select {
@@ -167,18 +160,12 @@ func (c *amqpSubscriber) runEventProcessor(deliveryChan <-chan amqp.Delivery) {
 
 			c.Logger.Debugf("recieved message %s\n", d.CorrelationId)
 
-			var workerNumber int
-			if c.workerCount > 0 {
-				// get worker from pool (blocks until one is available)
-				workerNumber = <-pool
-			}
-			c.Logger.Debugf("acquired worker %d\n", workerNumber)
-
+			workerNumber := pool.Get()
 			event := amqpEvent{d}
 			c.processingWG.Add(1)
 
-			go func(event *amqpEvent, log util.Logger) {
-				logger := log.WithField("workerNumber", workerNumber).
+			go func(worker int, event *amqpEvent, log util.Logger) {
+				logger := log.WithField("workerNumber", worker).
 					WithField("correlationId", event.GetCorrelationID())
 
 				ctx := util.NewSessionCtx(event.GetCorrelationID(), logger)
@@ -189,13 +176,10 @@ func (c *amqpSubscriber) runEventProcessor(deliveryChan <-chan amqp.Delivery) {
 
 				defer func() {
 					c.processingWG.Done()
-					if c.workerCount > 0 {
-						// store back worker to pool
-						pool <- workerNumber
-					}
+					pool.Put(worker)
 				}()
 
-			}(&event, c.Logger)
+			}(workerNumber, &event, c.Logger)
 
 		case <-c.stopChan:
 			c.Logger.Debugf("stop triggered")

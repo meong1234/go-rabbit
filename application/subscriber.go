@@ -5,6 +5,7 @@ import (
 	"github.com/go-rabbit/amqp"
 	"github.com/go-rabbit/messaging"
 	"github.com/go-rabbit/util"
+	"time"
 )
 
 type (
@@ -28,7 +29,7 @@ func (sub *subscriber) Start() error {
 		return err
 	}
 
-	_, err = sub.broker.CreateSubscription(sub.queueName, sub.queueName, "", true, 1, sub.handle)
+	_, err = sub.broker.CreateSubscription(sub.queueName, sub.queueName, "", true, 5, sub.handle)
 	if err != nil {
 		return err
 	}
@@ -42,5 +43,6 @@ func (sub *subscriber) Stop() error {
 
 func (sub *subscriber) handle(ctx context.Context, event messaging.Event) error {
 	util.SessionLogger(ctx).Debugf("received : %s", string(event.GetBody()))
+	time.Sleep(time.Second * 5)
 	return nil
 }
