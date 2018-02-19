@@ -112,7 +112,7 @@ func (c *amqpSubscriber) init(connection *amqp.Connection) error {
 		}
 	}()
 
-	if err := channel.Qos(c.workerCount * 2, 0, false); err != nil {
+	if err := channel.Qos(c.workerCount*2, 0, false); err != nil {
 		return err
 	}
 

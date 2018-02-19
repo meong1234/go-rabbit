@@ -23,9 +23,9 @@ type (
 
 func SetupApp() *Application {
 	amqpConf := amqp.RabbitConfig{
-		"localhost:32773",
-		"guest",
-		"guest",
+		Host:     "localhost:5672",
+		User:     "guest",
+		Password: "guest",
 	}
 
 	logger := Logger{Stdout: true, Level: "DEBUG"}

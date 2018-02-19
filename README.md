@@ -7,6 +7,9 @@ this rabbitMQ sample on golang
  - Logger: [Logrus](github.com/sirupsen/logrus)
  - CLI: [Urfave Cli](github.com/urfave/cli)
 
+### Run rabbitMQ using docker
+ - `docker-compose up -d`
+
 ### Run the app using command line
  - make build
 
