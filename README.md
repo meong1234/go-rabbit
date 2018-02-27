@@ -1,5 +1,9 @@
 # go-rabbit
-this rabbitMQ sample on golang
+this rabbitMQ sample on golang, used on my presentation
+
+### presentation
+slide : https://docs.google.com/presentation/d/11vPV8Elw4S4aXZXdHoEPIXkOJAFvqsw-LO9qoUpV-cw/edit
+youtube: https://www.youtube.com/watch?v=l_SgYpDu3JQ&t=2257s
 
 ### Dependencies
 
